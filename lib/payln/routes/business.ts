@@ -1,11 +1,11 @@
 import express, { Router } from "express";
-import { createBusiness } from "../controllers/business";
+import { createBusiness, validateCreateBusiness } from "../controllers/business";
 
 
 const businessRouter: Router = express.Router();
 
 businessRouter
 	.route("/")
-	.post(createBusiness);
+	.post(validateCreateBusiness, createBusiness);
 
 export default businessRouter;
