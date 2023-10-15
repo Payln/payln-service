@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import logger from "../../logger/logger";
-import sql from "../db";
 import { v4 as uuidv4 } from "uuid"; 
+import { PostgresError } from "postgres";
+import sql from "../db";
 
 export interface Business {
   id: string;
@@ -32,6 +32,11 @@ export async function insertBusiness({about, email, profileImageUrl, hashedPassw
     RETURNING *`;
 		return res;
 	} catch (error: any) {
-		logger.error(error.message);
+		if (error instanceof PostgresError) {
+      const dbErrMsg = error.message;
+      throw new Error(`insertion failed on '${dbErrMsg}'`);
+    } else {
+      throw error;
+    }
 	}
 }
