@@ -62,24 +62,10 @@ class GmailSender implements EmailSender {
   }
 }
 
-// Example usage:
 const sender = new GmailSender(
   configs.EmailSenderName,
   configs.EmailSenderAddress,
   configs.EmailSenderPassword
 );
 
-(async () => {
-  try {
-    await sender.sendEmail(
-      "Test Subject",
-      "<p>This is a test email.</p>",
-      ["mrikehchukwuka@gmail.com"],
-      [],
-      [],
-      []
-    );
-  } catch (error) {
-    console.error(error);
-  }
-})();
+export default sender;
