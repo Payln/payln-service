@@ -23,9 +23,7 @@ describe("Test business routes", () => {
       .post("/api/v1/business")
       .send(newBiz);
     
-      const { data: { result: { business } } } = res.body;
-
-    console.log(business);
+    const { data: { result: { business } } } = res.body;
 
     expect(res.statusCode).toEqual(201);
     expect(business.about).toEqual(newBiz.about);
