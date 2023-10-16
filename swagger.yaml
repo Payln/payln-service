@@ -1,0 +1,200 @@
+swagger: "2.0"
+info:
+  title: "Payln API"
+  description: "Rediscovery Bitcoin payment."
+  version: "1.0.0"
+host: "localhost:6780"
+basePath: "/api/v1"
+schemes:
+  - "https"
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+paths:
+  /api/v1/business:
+    post:
+      summary: Create a new business
+      description: Create a new business with the provided information.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/CreateBusinessRequest"
+      responses:
+        201:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              data:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      business:
+                        $ref: "#/definitions/Business"
+        400:
+          description: Bad Request.
+          schema:
+            $ref: "#/definitions/BadRequestErrorResponse"
+        500:
+          description: Internal server error.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+definitions:
+  CreateBusinessRequest:
+    type: object
+    properties:
+      about:
+        type: string
+        description: Business description.
+      email:
+        type: string
+        format: email
+        description: Email address of the business.
+      profile_image_url:
+        type: string
+        format: uri
+        description: URL of the business profile image.
+      password:
+        type: string
+        minLength: 8
+        description: Password for the business account.
+    required:
+      - about
+      - email
+      - password
+
+  Business:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the business.
+      name:
+        type: string
+        description: Business name.
+      about:
+        type: string
+        description: Business description.
+      email:
+        type: string
+        format: email
+        description: Email address of the business.
+      phone_number:
+        type: string
+        description: Phone number of the business.
+      address:
+        type: string
+        description: Business address.
+      city:
+        type: string
+        description: City where the business is located.
+      state:
+        type: string
+        description: State where the business is located.
+      postal_code:
+        type: string
+        description: Postal code of the business location.
+      country:
+        type: string
+        description: Country where the business is located.
+      website_url:
+        type: string
+        format: uri
+        description: URL of the business website.
+      profile_image_url:
+        type: string
+        format: uri
+        description: URL of the business profile image.
+      password:
+        type: string
+        description: Hashed password for the business account.
+      password_changed_at:
+        type: string
+        format: date-time
+        description: Date and time when the password was last changed.
+      created_at:
+        type: string
+        format: date-time
+        description: Date and time when the business was created.
+      updated_at:
+        type: string
+        format: date-time
+        description: Date and time when the business was last updated.
+      is_active:
+        type: boolean
+        description: Indicates whether the business is active.
+      is_email_verified:
+        type: boolean
+        description: Indicates whether the email of the business is verified.
+    required:
+      - id
+      - name
+      - about
+      - email
+      - phone_number
+      - address
+      - city
+      - state
+      - postal_code
+      - country
+      - website_url
+      - profile_image_url
+      - password
+      - password_changed_at
+      - created_at
+      - updated_at
+      - is_active
+      - is_email_verified
+
+  BadRequestErrorResponse:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          type: object
+          properties:
+            msg:
+              type: string
+              description: Error message.
+            type:
+              type: string
+              description: Error type.
+            value:
+              type: string
+              description: Error value.
+            path:
+              type: string
+              description: field path in JSON object.
+            location:
+              type: string
+              description: Error happened where in request.
+    required:
+      - errors
+
+  ErrorResponse:
+    type: object
+    properties:
+      status:
+        type: string
+      error:
+        type: object
+        properties:
+          message:
+            type: string
