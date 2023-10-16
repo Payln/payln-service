@@ -1,0 +1,47 @@
+name: Run tests suite
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: fde24e52415e
+          POSTGRES_DB: payln
+        ports:
+          - 5434:5432
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install golang-migrate
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+          sudo mv migrate /usr/bin/
+          which migrate
+
+      - name: Run database migrations
+        run: make migrateup
+
+      - name: Run tests
+        run: npm run test

@@ -5,10 +5,11 @@ import logger from "../../logger/logger";
 import { body, validationResult } from "express-validator";
 
 export const validateCreateBusiness = [
+  body("name").trim().isLength({ min: 1 }).withMessage("name is required"),
   body("about").trim().isLength({ min: 1 }).withMessage("about is required"),
   body("email").trim().isEmail().withMessage("Invalid email format"),
   body("profile_image_url").trim().isURL().withMessage("Invalid URL format"),
-  body("password").trim().isLength({ min: 8 }).withMessage("Password must be at least 6 characters long"),
+  body("password").trim().isLength({ min: 8 }).withMessage("Password must be at least 8 characters long"),
 ];
 
 export async function createBusiness(req: Request, res: Response) {
@@ -18,9 +19,10 @@ export async function createBusiness(req: Request, res: Response) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { about, email, profile_image_url, password } = req.body;
+    const { name, about, email, profile_image_url, password } = req.body;
 
     const param: InsertParams = {
+      name,
       about,
       email,
       profileImageUrl: profile_image_url,
