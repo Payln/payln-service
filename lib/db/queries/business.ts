@@ -16,7 +16,7 @@ export async function insertBusiness({ name, description, email, profileImageUrl
     const newId = uuidv4();
     const [business]: [Business?] = await sql`
     INSERT INTO businesses (
-      id, name, about, email, profile_image_url, hashed_password
+      id, name, description, general_email, profile_image_url, hashed_password
     ) VALUES (${newId}, ${name}, ${description}, ${email}, ${profileImageUrl}, ${hashedPassword})
     RETURNING *`;
     return business;
