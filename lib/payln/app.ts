@@ -15,7 +15,7 @@ import fs from "fs";
 import YAML from "yaml";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
-import sender from "../mailer/sender";
+import GmailSender from "../mailer/sender";
 
 // read and parse swagger yaml file
 const file = fs.readFileSync("./swagger.yaml", "utf8");
@@ -66,7 +66,14 @@ export class Payln {
 	}
 
 	public async start(): Promise<void> {
+		const sender = new GmailSender(
+			this.configs.EmailSenderName,
+			this.configs.EmailSenderAddress,
+			this.configs.EmailSenderPassword
+		);
 
+		logger.info(`${this.configs.EmailSenderName}:${this.configs.EmailSenderAddress}:${this.configs.EmailSenderPassword}`);
+		
 		await sender.sendEmail(
       "Test Subject",
       "<p>This is a test email.</p>",
