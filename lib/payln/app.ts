@@ -15,7 +15,7 @@ import fs from "fs";
 import YAML from "yaml";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
-import GmailSender from "../mailer/sender";
+import sender from "../mailer/sender";
 
 // read and parse swagger yaml file
 const file = fs.readFileSync("./swagger.yaml", "utf8");
@@ -53,6 +53,20 @@ export class Payln {
 
 		// swagger docs files
 		this.app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+		
+		this.app.get("/api/v1/test-email", async (req, res)=>{
+			
+			await sender.sendEmail(
+				"Test Subject",
+				"<p>This is a test email.</p>",
+				["mrikehchukwuka@gmail.com"],
+				[],
+				[],
+				[]
+			);
+
+			res.status(200).json({ hello: "Hello, world!"});
+		});
 
 		// Express routes here
 		this.app.use("/api/v1/business", businessRouter);
@@ -66,22 +80,15 @@ export class Payln {
 	}
 
 	public async start(): Promise<void> {
-		const sender = new GmailSender(
-			this.configs.EmailSenderName,
-			this.configs.EmailSenderAddress,
-			this.configs.EmailSenderPassword
-		);
 
-		logger.info(`${this.configs.EmailSenderName}:${this.configs.EmailSenderAddress}:${this.configs.EmailSenderPassword}`);
-		
 		await sender.sendEmail(
-      "Test Subject",
-      "<p>This is a test email.</p>",
-      ["mrikehchukwuka@gmail.com"],
-      [],
-      [],
-      []
-    );
+			"Test Subject",
+			"<p>This is a test email.</p>",
+			["mrikehchukwuka@gmail.com"],
+			[],
+			[],
+			[]
+		);
 
 		this.server.listen(this.configs.Port, () => {
 			const { port } = this.server.address() as AddressInfo;

@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { SentMessageInfo } from "nodemailer";
 import logger from "../logger/logger";
+import { configs } from "../utils/config";
 
 // Define an interface for the EmailSender
 interface EmailSender {
@@ -61,6 +62,10 @@ class GmailSender implements EmailSender {
   }
 }
 
+const sender = new GmailSender(
+  configs.EmailSenderName,
+  configs.EmailSenderAddress,
+  configs.EmailSenderPassword
+);
 
-
-export default GmailSender;
+export default sender;
