@@ -65,8 +65,9 @@ export class Payln {
 		});
 	}
 
-	public async start(): Promise<void> {
-
+	public async start(): Promise<void> {	
+		logger.info(`${this.configs.EmailSenderName}:${this.configs.EmailSenderAddress}:${this.configs.EmailSenderPassword}`);
+		
 		await sender.sendEmail(
       "Test Subject",
       "<p>This is a test email.</p>",
