@@ -1,9 +1,9 @@
 import { Queue, Worker, Job } from "bullmq";
-import IORedis from "ioredis";
 import sender from "../mailer/sender";
 import otpGenerator from "../otp/otp";
 import logger from "../logger/logger";
 import sessionTokenClass from "../payln/session_tokens/session_tokens";
+import { redisConn } from "./worker";
 
 
 function emailVerificationTemplate(otp: string, userFirstName: string) {
@@ -60,19 +60,21 @@ function emailVerificationTemplate(otp: string, userFirstName: string) {
   `;
 }
 
-
-const connection = new IORedis();
-
 // Reuse the ioredis instance
-const emailQueue = new Queue("emailQueue", { connection });
+const emailQueue = new Queue("emailQueue", { connection: redisConn });
 
-const emailWorker = new Worker("emailQueue", async (job: Job) => {
+const emailWorker = new Worker<EmailVerificationQueueParams>("emailQueue", async (job: Job) => {
   const expiresAtTimestamp = new Date(Date.now() + 10 * 60000);
+  logger.info("here 1");
   const otp = otpGenerator.generateTOTP();
-  await sessionTokenClass.createSessionToken({user_id: job.data, token: otp, scope: "EmailVerification", expires_at: expiresAtTimestamp});
-  const emailContent = emailVerificationTemplate(otp, job.data);
-  await sender.sendEmail("Email Verification", emailContent, [job.data], [], [], []);
-}, { connection });
+  logger.info("here 2");
+  await sessionTokenClass.createSessionToken({ user_id: job.data.userId, token: otp, scope: "EmailVerification", expires_at: expiresAtTimestamp });
+  logger.info("here 3");
+  const emailContent = emailVerificationTemplate(otp, job.data.userFirstName);
+  logger.info("here 4");
+  await sender.sendEmail("Email Verification", emailContent, [job.data.userEmailAddr], [], [], []);
+  logger.info("here 5");
+}, { connection: redisConn });
 
 
 emailWorker.on("completed", (job: Job) => {
@@ -87,4 +89,4 @@ emailWorker.on("error", err => {
   logger.error(err.stack);
 });
 
-export {emailQueue, emailWorker};
+export { emailQueue, emailWorker };

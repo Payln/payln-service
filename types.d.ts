@@ -72,3 +72,9 @@ interface ISessionToken {
 interface CheckSessionResult {
   session_exists: boolean;
 }
+
+interface EmailVerificationQueueParams {
+  userId: number;
+  userFirstName: string;
+  userEmailAddr: string;
+}

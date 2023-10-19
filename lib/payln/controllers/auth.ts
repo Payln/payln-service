@@ -3,15 +3,16 @@ import { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import UserClass from "../users/users";
 import logger from "../../logger/logger";
+import { emailQueue } from "../../bg_workers/send_email_worker";
 
-export const validateCreateUser = [
+export const signUpUserUser = [
   body("first_name").trim().isLength({ min: 1 }).withMessage("first_name is required"),
   body("last_name").trim().isLength({ min: 1 }).withMessage("last_name is required"),
   body("email").trim().isEmail().withMessage("Invalid email format"),
   body("password").trim().isLength({ min: 8 }).withMessage("Password must be at least 8 characters long"),
 ];
 
-export async function createUser(req: Request, res: Response) {
+export async function signUpUser(req: Request, res: Response) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -36,12 +37,20 @@ export async function createUser(req: Request, res: Response) {
         message: "User creation failed",
       });
     }
+
+    const job = await emailQueue.add("send_email_verification", {
+      userId: user.id, 
+      userFirstName: user.first_name, 
+      userEmailAddr: user.email
+    });
+    logger.info(`background_task with id ${job.id} enqueued`);
+
     res.status(201).json({
       status: "success",
       data: {
         message: "new user created",
         result: {
-          business: UserClass.scrubUserData(user),
+          user: UserClass.scrubUserData(user),
         },
       },
     });

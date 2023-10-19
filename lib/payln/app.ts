@@ -16,6 +16,8 @@ import YAML from "yaml";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
 import UsersRouter from "./routes/users";
+import {  emailWorker } from "../bg_workers/send_email_worker";
+import { redisConn } from "../bg_workers/worker";
 
 // read and parse swagger yaml file
 const file = fs.readFileSync("./swagger.yaml", "utf8");
@@ -67,6 +69,9 @@ export class Payln {
 	}
 
 	public async start(): Promise<void> {
+
+		
+
 		this.server.listen(this.configs.Port, () => {
 			const { port } = this.server.address() as AddressInfo;
 			logger.info(`Server is running on port ${port}`);
@@ -79,7 +84,13 @@ export class Payln {
 				logger.info("Server is gracefully shutting down");
 
 				logger.info("closing db connection");
-				sql.end();
+				await sql.end();
+
+				logger.info("closing background worker");
+				await emailWorker.close();
+
+				logger.info("closing redis connection");
+				redisConn.quit();
 
 				logger.info("Server shutdown completed");
 				process.exit(0);
