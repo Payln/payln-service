@@ -36,3 +36,23 @@ CREATE TABLE "businesses" (
 );
 
 ALTER TABLE "businesses" ADD FOREIGN KEY ("owner_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+-- SessionTokens Table
+CREATE TABLE "session_tokens" (
+  "id" uuid PRIMARY KEY,
+  "user_id" bigint NOT NULL,
+  "token" varchar NOT NULL,
+  "scope" varchar NOT NULL,
+  "is_blocked" boolean NOT NULL DEFAULT false,
+  "extra_details" jsonb NOT NULL DEFAULT '{}',
+  "expires_at" timestamptz NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+ALTER TABLE "session_tokens" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+CREATE OR REPLACE FUNCTION delete_expired_sessions()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM sessions WHERE expires_at < NOW();
+END;
+$$ LANGUAGE plpgsql;

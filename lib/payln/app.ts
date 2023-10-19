@@ -15,6 +15,7 @@ import fs from "fs";
 import YAML from "yaml";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
+import UsersRouter from "./routes/users";
 
 // read and parse swagger yaml file
 const file = fs.readFileSync("./swagger.yaml", "utf8");
@@ -39,6 +40,7 @@ export class Payln {
 		this.app.use(cors());
 		this.app.use(helmet());
 		this.app.use(compression());
+		this.app.enable("trust proxy");
 		if (this.configs.Env === "development") {
 			this.app.use(morgan("dev"));
 		}
@@ -53,7 +55,8 @@ export class Payln {
 		// swagger docs files
 		this.app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 		// Express routes here
-		this.app.use("/api/v1/business", businessRouter);
+		this.app.use("/business", businessRouter);
+		this.app.use("/users", UsersRouter);
 
 		this.app.all("*", (req, res) => {
 			return res.status(404).json({
