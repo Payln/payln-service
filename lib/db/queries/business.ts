@@ -5,19 +5,19 @@ import sql from "../db";
 
 export interface InsertParams {
   name: string;
-  about: string;
+  description: string;
   email: string;
   profileImageUrl: string;
   hashedPassword: string;
 }
 
-export async function insertBusiness({ name, about, email, profileImageUrl, hashedPassword }: InsertParams) {
+export async function insertBusiness({ name, description, email, profileImageUrl, hashedPassword }: InsertParams) {
   try {
     const newId = uuidv4();
     const [business]: [Business?] = await sql`
     INSERT INTO businesses (
-      id, name, about, email, profile_image_url, hashed_password
-    ) VALUES (${newId}, ${name}, ${about}, ${email}, ${profileImageUrl}, ${hashedPassword})
+      id, name, description, general_email, profile_image_url, hashed_password
+    ) VALUES (${newId}, ${name}, ${description}, ${email}, ${profileImageUrl}, ${hashedPassword})
     RETURNING *`;
     return business;
   } catch (error: any) {
