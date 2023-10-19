@@ -14,7 +14,7 @@ export interface InsertParams {
 export async function insertBusiness({ name, description, email, profileImageUrl, hashedPassword }: InsertParams) {
   try {
     const newId = uuidv4();
-    const [business]: [Business?] = await sql`
+    const [business]: [IBusiness?] = await sql`
     INSERT INTO businesses (
       id, name, description, general_email, profile_image_url, hashed_password
     ) VALUES (${newId}, ${name}, ${description}, ${email}, ${profileImageUrl}, ${hashedPassword})

@@ -1,4 +1,5 @@
-interface User {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+interface IUser {
   id: number;
   first_name: string;
   last_name: string;
@@ -11,7 +12,7 @@ interface User {
   is_email_verified: boolean;
 }
 
-interface Business {
+interface IBusiness {
   id: string;
   owner_id: number;
   name: string;
@@ -29,4 +30,51 @@ interface Business {
   created_at: Date;
   updated_at: Date;
   is_active: boolean;
+}
+
+interface CreateUserParams {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+interface UpdateUserParams {
+  id?: number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  hashed_password: string;
+  is_email_verified?: boolean;
+  is_active?: boolean;
+  password_changed_at?: Date;
+}
+
+interface CreateSessionTokenParams {
+  user_id: number;
+  token: string;
+  scope: string;
+  expires_at: Date;
+  extra_details?: Record<string, any>;
+}
+
+interface ISessionToken {
+  id: string;
+  user_id: number;
+  token: string;
+  scope: string;
+  is_blocked: boolean;
+  extra_details: Record<string, any>;
+  expires_at: Date;
+  created_at: Date;
+}
+
+interface CheckSessionResult {
+  session_exists: boolean;
+}
+
+interface EmailVerificationQueueParams {
+  userId: number;
+  userFirstName: string;
+  userEmailAddr: string;
 }

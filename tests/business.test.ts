@@ -4,8 +4,9 @@ import request from "supertest";
 import { Payln } from "../lib/payln/app";
 import { configs } from "../lib/utils/config";
 import sql from "../lib/db/db";
+import { redisConn } from "../lib/bg_workers/worker";
 
-const testPayln: Payln = new Payln(configs);
+// const testPayln: Payln = new Payln(configs);
 
 describe("Test business routes", () => {
   it("should test create business route", async () => {
