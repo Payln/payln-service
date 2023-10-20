@@ -1,9 +1,9 @@
 import express, { Router } from "express";
-import { signUpUser, validateSignUpUser } from "../controllers/auth";
+import { signUpUser, validateSignUpUserParams } from "../controllers/auth";
 
 
 const authRouter: Router = express.Router();
 
-authRouter.post("/signup", validateSignUpUser, signUpUser);
+authRouter.post("/signup", validateSignUpUserParams, signUpUser);
 
 export default authRouter;

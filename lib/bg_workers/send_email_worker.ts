@@ -3,7 +3,7 @@ import sender from "../mailer/sender";
 import otpGenerator from "../otp/otp";
 import logger from "../logger/logger";
 import sessionTokenClass from "../payln/session_tokens/session_tokens";
-import { redisConn } from "./worker";
+import { defaultJobOptions, redisConn, removeOnFail } from "./worker";
 
 
 function emailVerificationTemplate(otp: string, userFirstName: string) {
@@ -60,32 +60,18 @@ function emailVerificationTemplate(otp: string, userFirstName: string) {
   `;
 }
 
-// Reuse the ioredis instance
 const emailQueue = new Queue("emailQueue", {
-  connection: redisConn, defaultJobOptions: {
-    attempts: 10,
-    backoff: {
-      type: "exponential",
-      delay: 3000,
-    }
-  }
+  connection: redisConn, defaultJobOptions
 });
 
 const emailWorker = new Worker<EmailVerificationQueueParams>("emailQueue", async (job: Job) => {
   const expiresAtTimestamp = new Date(Date.now() + 10 * 60000);
-  logger.info("here 1");
   const otp = otpGenerator.generateTOTP();
-  logger.info("here 2");
   await sessionTokenClass.createSessionToken({ user_id: job.data.userId, token: otp, scope: "EmailVerification", expires_at: expiresAtTimestamp });
-  logger.info("here 3");
   const emailContent = emailVerificationTemplate(otp, job.data.userFirstName);
-  logger.info("here 4");
   await sender.sendEmail("Email Verification", emailContent, [job.data.userEmailAddr], [], [], []);
-  logger.info("here 5");
 }, {
-  connection: redisConn, removeOnFail: {
-    age: 240,
-  },
+  connection: redisConn, removeOnFail
 });
 
 

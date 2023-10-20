@@ -34,3 +34,8 @@ export function randomEmail(): string {
 export function randomProfileImgUrl(): string {
   return `https://${randomString(15)}.png`;
 }
+
+// Compare current time against time
+export function afterTime(time: Date) {
+  return new Date() > time;
+}
