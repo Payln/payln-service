@@ -5,7 +5,7 @@ import UserClass from "../users/users";
 import logger from "../../logger/logger";
 import { emailQueue } from "../../bg_workers/send_email_worker";
 
-export const signUpUserUser = [
+export const validateSignUpUser = [
   body("first_name").trim().isLength({ min: 1 }).withMessage("first_name is required"),
   body("last_name").trim().isLength({ min: 1 }).withMessage("last_name is required"),
   body("email").trim().isEmail().withMessage("Invalid email format"),

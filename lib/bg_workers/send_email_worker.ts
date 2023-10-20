@@ -61,7 +61,15 @@ function emailVerificationTemplate(otp: string, userFirstName: string) {
 }
 
 // Reuse the ioredis instance
-const emailQueue = new Queue("emailQueue", { connection: redisConn });
+const emailQueue = new Queue("emailQueue", {
+  connection: redisConn, defaultJobOptions: {
+    attempts: 10,
+    backoff: {
+      type: "exponential",
+      delay: 3000,
+    }
+  }
+});
 
 const emailWorker = new Worker<EmailVerificationQueueParams>("emailQueue", async (job: Job) => {
   const expiresAtTimestamp = new Date(Date.now() + 10 * 60000);
@@ -74,7 +82,11 @@ const emailWorker = new Worker<EmailVerificationQueueParams>("emailQueue", async
   logger.info("here 4");
   await sender.sendEmail("Email Verification", emailContent, [job.data.userEmailAddr], [], [], []);
   logger.info("here 5");
-}, { connection: redisConn });
+}, {
+  connection: redisConn, removeOnFail: {
+    age: 240,
+  },
+});
 
 
 emailWorker.on("completed", (job: Job) => {

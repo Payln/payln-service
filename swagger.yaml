@@ -3,8 +3,9 @@ info:
   title: "Payln API"
   description: "Rediscovery Bitcoin payment."
   version: "1.0.0"
-host: "localhost:6780"
-basePath: "/api/v1"
+# host: "localhost:6780"
+host: "https://payln-staging.onrender.com"
+basePath: ""
 schemes:
   - "https"
   - "http"
@@ -18,7 +19,7 @@ securityDefinitions:
     name: Authorization
     in: header
 paths:
-  /api/v1/business:
+  /business:
     post:
       summary: Create a new business
       description: Create a new business with the provided information.
@@ -46,6 +47,42 @@ paths:
                     properties:
                       business:
                         $ref: "#/definitions/Business"
+        400:
+          description: Bad Request.
+          schema:
+            $ref: "#/definitions/BadRequestErrorResponse"
+        500:
+          description: Internal server error.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /auth/signup:
+    post:
+      summary: Sign up a new user
+      description: Create a new user with the provided information.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/SignUpUserRequest" 
+      responses:
+        201:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              data:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      user:
+                        $ref: "#/definitions/User"
         400:
           description: Bad Request.
           schema:
@@ -198,3 +235,61 @@ definitions:
         properties:
           message:
             type: string
+
+  SignUpUserRequest:
+    type: object
+    properties:
+      first_name:
+        type: string
+        description: User's first name.
+      last_name:
+        type: string
+        description: User's last name.
+      email:
+        type: string
+        format: email
+        description: User's email address.
+      password:
+        type: string
+        minLength: 8
+        description: User's password.
+    required:
+      - first_name
+      - last_name
+      - email
+      - password
+
+  User:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the user.
+      first_name:
+        type: string
+        description: User's first name.
+      last_name:
+        type: string
+        description: User's last name.
+      email:
+        type: string
+        format: email
+        description: User's email address.
+      created_at:
+        type: string
+        format: date-time
+        description: time user was created.
+      is_active:
+        type: boolean
+        description: Is user active/inactive.
+      is_email_verified:
+        type: boolean
+        description: Is user's email verified as the owner.
+    required:
+      - id
+      - first_name
+      - last_name
+      - email
+      - created_at
+      - is_active
+      - is_email_verified

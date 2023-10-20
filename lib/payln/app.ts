@@ -55,7 +55,7 @@ export class Payln {
 		this.app.use("/api", limiter);
 
 		// swagger docs files
-		this.app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+		this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 		// Express routes here
 		this.app.use("/business", businessRouter);
 		this.app.use("/users", UsersRouter);

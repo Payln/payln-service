@@ -1,11 +1,9 @@
 import express, { Router } from "express";
-import { signUpUser, signUpUserUser } from "../controllers/auth";
+import { signUpUser, validateSignUpUser } from "../controllers/auth";
 
 
-const UsersRouter: Router = express.Router();
+const router: Router = express.Router();
 
-UsersRouter
-	.route("/")
-	.post(signUpUserUser, signUpUser);
+router.post("/auth/signup", validateSignUpUser, signUpUser);
 
-export default UsersRouter;
+export default router;
