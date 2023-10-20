@@ -15,9 +15,9 @@ import fs from "fs";
 import YAML from "yaml";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
-import UsersRouter from "./routes/users";
 import {  emailWorker } from "../bg_workers/send_email_worker";
 import { redisConn } from "../bg_workers/worker";
+import authRouter from "./routes/auth";
 
 // read and parse swagger yaml file
 const file = fs.readFileSync("./swagger.yaml", "utf8");
@@ -58,7 +58,7 @@ export class Payln {
 		this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 		// Express routes here
 		this.app.use("/business", businessRouter);
-		this.app.use("/users", UsersRouter);
+		this.app.use("/auth", authRouter);
 
 		this.app.all("*", (req, res) => {
 			return res.status(404).json({
