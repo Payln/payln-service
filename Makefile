@@ -1,4 +1,5 @@
 DB_URL=postgres://root:fde24e52415e@localhost:5434/payln?sslmode=disable
+DB_URL=postgres://payln_db_user:ztHYWYUNvAiDJgDHIXS1FUeH9XHTxNXf@dpg-ckmpljq216ps73865jcg-a.oregon-postgres.render.com/payln_db
 
 migration_file:
 	migrate create -ext sql -dir lib/db/migrations -seq $(file_name)

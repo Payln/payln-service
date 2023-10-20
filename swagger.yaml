@@ -4,7 +4,7 @@ info:
   description: "Rediscovery Bitcoin payment."
   version: "1.0.0"
 # host: "localhost:6780"
-host: "https://payln-staging.onrender.com"
+host: "payln-staging.onrender.com"
 basePath: ""
 schemes:
   - "https"
