@@ -102,6 +102,13 @@ export async function sendEmailVerification(req: Request, res: Response) {
       });
     }
 
+    if (user.is_email_verified) {
+      return res.status(200).json({
+        status: "info",
+        message: "User email is already verified. Login user instead",
+      });
+    }
+
     const job = await emailQueue.add("send_email_verification", {
       userId: user.id,
       userFirstName: user.first_name,
