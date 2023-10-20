@@ -63,3 +63,10 @@ export async function signUpUser(req: Request, res: Response) {
   }
 }
 
+export const validateLoginUser = [
+
+];
+
+export async function loginUser(req: Request, res: Response) {
+
+}

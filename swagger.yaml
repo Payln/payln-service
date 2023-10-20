@@ -19,7 +19,7 @@ securityDefinitions:
     name: Authorization
     in: header
 paths:
-  /business:
+  /businesses:
     post:
       summary: Create a new business
       description: Create a new business with the provided information.
@@ -91,7 +91,7 @@ paths:
           description: Internal server error.
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /user/email-verification:
+  /users/email-verification:
     post:
       summary: Verify user's email
       description: Verify the user's email using OTP.
