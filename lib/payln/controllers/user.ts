@@ -8,6 +8,7 @@ import { afterTime } from "../../utils/random";
 import userClass from "../users/users";
 import { deleteSessionTokenQueue } from "../../bg_workers/delete_session_token";
 import pasetoMaker from "../../paseto_token/paseto";
+import { emailQueue } from "../../bg_workers/send_email_worker";
 
 export const validateEmailVerificationParams = [
   body("otp").trim().isLength({ min: 6 }).withMessage("otp must be a minimum of 6 characters"),
@@ -30,7 +31,7 @@ export async function emailVerification(req: Request, res: Response) {
 
     const { otp, user_id } = req.body;
     const session = await sessionTokenClass.getASessionToken(otp, "EmailVerification", user_id);
-    
+
     if (!session) {
       return res.status(404).json({
         status: "error",
@@ -38,15 +39,15 @@ export async function emailVerification(req: Request, res: Response) {
       });
     }
 
-     if (afterTime(session.expires_at)) {
+    if (afterTime(session.expires_at)) {
       return res.status(401).json({
         status: "error",
         message: "Provided OTP has expired.",
       });
-     }
+    }
 
-     const updatedUser = await userClass.updateUser(user_id, null, null, null, null, true);
-     if (!updatedUser) {
+    const updatedUser = await userClass.updateUser(user_id, null, null, null, null, true);
+    if (!updatedUser) {
       return res.status(404).json({
         status: "error",
         message: "Invalid User ID provided.",
@@ -60,7 +61,7 @@ export async function emailVerification(req: Request, res: Response) {
 
     const { token } = await pasetoMaker.createToken(updatedUser.id, updatedUser.email, 25, null);
 
-    res.status(201).json({
+    return res.status(201).json({
       status: "success",
       data: {
         message: "User's email verified successfully.",
@@ -76,6 +77,49 @@ export async function emailVerification(req: Request, res: Response) {
     return res.status(500).json({
       status: "error",
       message: "An error occurred while verifying user's email",
+    });
+  }
+}
+
+export const validateSendEmailVerificationParams = [
+  body("email").trim().isEmail().withMessage("Invalid email format"),
+];
+
+export async function sendEmailVerification(req: Request, res: Response) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+
+    const user = await userClass.getUser(null, email);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    const job = await emailQueue.add("send_email_verification", {
+      userId: user.id,
+      userFirstName: user.first_name,
+      userEmailAddr: user.email
+    });
+    logger.info(`Background task with id ${job.id} enqueued`);
+
+    return res.status(201).json({
+      status: "success",
+      data: {
+        message: "email verification send",
+      },
+    });
+  } catch (error: any) {
+    logger.error(error.message);
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while creating the user",
     });
   }
 }

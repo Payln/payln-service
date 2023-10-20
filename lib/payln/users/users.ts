@@ -36,10 +36,10 @@ class User {
     };
   }
 
-  async getUser(id: number) {
+  async getUser(id: number | null, email: string | null) {
     try {
       const [user]: [IUser?] = await sql`
-      SELECT * FROM users WHERE id = ${id} LIMIT 1;
+      SELECT * FROM users WHERE id = ${id} OR email = ${email} LIMIT 1;
     `;
       return user;
     } catch (error) {

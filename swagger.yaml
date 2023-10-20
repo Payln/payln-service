@@ -91,6 +91,67 @@ paths:
           description: Internal server error.
           schema:
             $ref: "#/definitions/ErrorResponse"
+
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticate the user with email and password.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: User's email address.
+              password:
+                type: string
+                minLength: 8
+                description: User's password.
+            required:
+              - email
+              - password
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              data:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      user:
+                        $ref: "#/definitions/User"
+                      access_token:
+                        type: string
+        400:
+          description: Bad Request.
+          schema:
+            $ref: "#/definitions/BadRequestErrorResponse"
+        401:
+          description: Unauthorized.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        403:
+          description: Forbidden.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: Internal server error.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+
   /users/email-verification:
     post:
       summary: Verify user's email
@@ -129,6 +190,49 @@ paths:
           description: Unauthorized.
           schema:
             $ref: "#/definitions/ErrorResponse"
+        404:
+          description: Not Found.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: Internal server error.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /users/send-email-verification:
+    post:
+      summary: Send email verification
+      description: Send email verification to the specified email address.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: Email address to which the verification email will be sent.
+            required:
+              - email
+      responses:
+        201:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              data:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request.
+          schema:
+            $ref: "#/definitions/BadRequestErrorResponse"
         404:
           description: Not Found.
           schema:
