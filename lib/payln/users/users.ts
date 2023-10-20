@@ -41,6 +41,7 @@ class User {
       const [user]: [IUser?] = await sql`
       SELECT * FROM users WHERE id = ${id} OR email = ${email} LIMIT 1;
     `;
+
       return user;
     } catch (error) {
       if (error instanceof PostgresError) {
