@@ -78,3 +78,7 @@ interface EmailVerificationQueueParams {
   userFirstName: string;
   userEmailAddr: string;
 }
+
+interface DeleteSessionTokenParams {
+  sessionTokenId: string
+}

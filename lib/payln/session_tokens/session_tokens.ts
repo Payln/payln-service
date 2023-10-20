@@ -47,6 +47,22 @@ class SessionToken {
     }
   }
 
+  async getASessionToken(token: string, scope: string, userId: number) {
+    try {
+      const [sessionToken]: [ISessionToken?] = await sql`
+        SELECT * FROM session_tokens WHERE token = ${token} AND user_id = ${userId} AND scope = ${scope};
+      `;
+      return sessionToken;
+    } catch (error) {
+      if (error instanceof PostgresError) {
+        const dbErrMsg = error.message;
+        throw new Error(`Query failed on '${dbErrMsg}'`);
+      } else {
+        throw error;
+      }
+    }
+  }
+
   async checkSessionTokenExists(token: string, scope: string) {
     try {
       const [result]: [CheckSessionResult] = await sql`
@@ -67,6 +83,22 @@ class SessionToken {
     try {
       await sql`
       SELECT delete_expired_sessions();
+      `;
+    } catch (error) {
+      if (error instanceof PostgresError) {
+        const dbErrMsg = error.message;
+        throw new Error(`Deletion failed on '${dbErrMsg}'`);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  async deleteSessionToken(id: string) {
+    try {
+      await sql`
+        DELETE FROM session_tokens
+        WHERE id = ${id};
       `;
     } catch (error) {
       if (error instanceof PostgresError) {
