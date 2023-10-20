@@ -91,6 +91,52 @@ paths:
           description: Internal server error.
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /user/email-verification:
+    post:
+      summary: Verify user's email
+      description: Verify the user's email using OTP.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/EmailVerificationRequest"
+      responses:
+        201:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              data:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      user:
+                        $ref: "#/definitions/User"
+                      access_token:
+                        type: string
+        400:
+          description: Bad Request.
+          schema:
+            $ref: "#/definitions/BadRequestErrorResponse"
+        401:
+          description: Unauthorized.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        404:
+          description: Not Found.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: Internal server error.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
 definitions:
   CreateBusinessRequest:
@@ -263,7 +309,7 @@ definitions:
     type: object
     properties:
       id:
-        type: string
+        type: number
         description: Unique identifier for the user.
       first_name:
         type: string
@@ -293,3 +339,16 @@ definitions:
       - created_at
       - is_active
       - is_email_verified
+
+  EmailVerificationRequest:
+    type: object
+    properties:
+      otp:
+        type: string
+        description: One-time password for email verification.
+      user_id:
+        type: integer
+        description: User's ID for email verification.
+    required:
+      - otp
+      - user_id

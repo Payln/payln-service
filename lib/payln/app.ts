@@ -18,6 +18,7 @@ import compression from "compression";
 import {  emailWorker } from "../bg_workers/send_email_worker";
 import { redisConn } from "../bg_workers/worker";
 import authRouter from "./routes/auth";
+import { healthCheckHandler } from "./controllers/healthcheck";
 
 // read and parse swagger yaml file
 const file = fs.readFileSync("./swagger.yaml", "utf8");
@@ -42,7 +43,7 @@ export class Payln {
 		this.app.use(cors());
 		this.app.use(helmet());
 		this.app.use(compression());
-		this.app.enable("trust proxy");
+		this.app.set("trust proxy", 1);
 		if (this.configs.Env === "development" || this.configs.Env === "staging") {
 			this.app.use(morgan("dev"));
 		}
@@ -52,7 +53,8 @@ export class Payln {
 			windowMs: 60 * 1000, // 1 minute
 			message: "too many requests from this IP, please try again in a minute!"
 		});
-		this.app.use("/api", limiter);
+		this.app.use("/", limiter);
+		this.app.get("/", healthCheckHandler);
 
 		// swagger docs files
 		this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

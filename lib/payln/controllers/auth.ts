@@ -8,6 +8,7 @@ import sessionTokenClass from "../session_tokens/session_tokens";
 import { afterTime } from "../../utils/random";
 import userClass from "../users/users";
 import { deleteSessionTokenQueue } from "../../bg_workers/delete_session_token";
+import pasetoMaker from "../../paseto_token/paseto";
 
 export const validateSignUpUserParams = [
   body("first_name").trim().isLength({ min: 1 }).withMessage("first_name is required"),
@@ -90,26 +91,24 @@ export async function emailVerification(req: Request, res: Response) {
     const session = await sessionTokenClass.getASessionToken(otp, "EmailVerification", user_id);
     
     if (!session) {
-      // Handle the case where session is undefined
-      return res.status(400).json({
+      return res.status(404).json({
         status: "error",
-        message: "Invalid OTP or user_id provided",
+        message: "Invalid OTP or user ID provided.",
       });
     }
 
      if (afterTime(session.expires_at)) {
-      return res.status(400).json({
+      return res.status(401).json({
         status: "error",
-        message: "OTP has expired",
+        message: "Provided OTP has expired.",
       });
      }
 
      const updatedUser = await userClass.updateUser(user_id, null, null, null, null, true);
      if (!updatedUser) {
-      // Handle the case where user is undefined
-      return res.status(500).json({
+      return res.status(404).json({
         status: "error",
-        message: "User update failed",
+        message: "Invalid User ID provided.",
       });
     }
 
@@ -118,12 +117,15 @@ export async function emailVerification(req: Request, res: Response) {
     });
     logger.info(`Background task with id ${job.id} enqueued`);
 
+    const { token } = await pasetoMaker.createToken(updatedUser.id, updatedUser.email, 25, null);
+
     res.status(201).json({
       status: "success",
       data: {
-        message: "User email verified",
+        message: "User's email verified successfully.",
         result: {
           user: UserClass.scrubUserData(updatedUser),
+          access_token: token,
         },
       },
     });
