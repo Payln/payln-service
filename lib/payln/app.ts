@@ -60,7 +60,7 @@ export class Payln {
 		// swagger docs files
 		this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 		// Express routes here
-		this.app.use("/business", businessRouter);
+		this.app.use("/businesses", businessRouter);
 		this.app.use("/auth", authRouter);
 		this.app.use("/users", userRouter);
 
