@@ -43,7 +43,7 @@ export class Payln {
 		this.app.use(helmet());
 		this.app.use(compression());
 		this.app.enable("trust proxy");
-		if (this.configs.Env === "development") {
+		if (this.configs.Env === "development" || this.configs.Env === "staging") {
 			this.app.use(morgan("dev"));
 		}
 
