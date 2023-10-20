@@ -19,6 +19,7 @@ import {  emailWorker } from "../bg_workers/send_email_worker";
 import { redisConn } from "../bg_workers/worker";
 import authRouter from "./routes/auth";
 import { healthCheckHandler } from "./controllers/healthcheck";
+import userRouter from "./routes/users";
 
 // read and parse swagger yaml file
 const file = fs.readFileSync("./swagger.yaml", "utf8");
@@ -61,6 +62,7 @@ export class Payln {
 		// Express routes here
 		this.app.use("/business", businessRouter);
 		this.app.use("/auth", authRouter);
+		this.app.use("/users", userRouter);
 
 		this.app.all("*", (req, res) => {
 			return res.status(404).json({
