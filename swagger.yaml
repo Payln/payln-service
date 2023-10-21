@@ -51,10 +51,21 @@ paths:
           description: Bad Request.
           schema:
             $ref: "#/definitions/BadRequestErrorResponse"
+        401:
+          description: Unauthorized.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        404:
+          description: Not Found.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
         500:
           description: Internal server error.
           schema:
             $ref: "#/definitions/ErrorResponse"
+      security:
+        - Bearer: []
+
   /auth/signup:
     post:
       summary: Sign up a new user
@@ -246,94 +257,93 @@ definitions:
   CreateBusinessRequest:
     type: object
     properties:
-      about:
+      name:
+        type: string
+        description: Business name.
+      description:
         type: string
         description: Business description.
-      email:
+      general_email:
         type: string
         format: email
-        description: Email address of the business.
-      profile_image_url:
+        description: General email address of the business.
+      website_url:
         type: string
         format: uri
-        description: URL of the business profile image.
-      password:
-        type: string
-        minLength: 8
-        description: Password for the business account.
+        description: URL of the business website.
     required:
-      - about
-      - email
-      - password
+      - name
+      - description
+      - general_email
+      - website_url
 
   Business:
     type: object
     properties:
       id:
         type: string
+        format: uuid
         description: Unique identifier for the business.
+      owner_id:
+        type: integer
+        description: Owner's ID for the business.
       name:
         type: string
         description: Business name.
-      about:
+      description:
         type: string
         description: Business description.
-      email:
+      general_email:
         type: string
         format: email
-        description: Email address of the business.
+        description: General email address of the business.
+      dispute_email:
+        type: string
+        format: email
+        description: Dispute email address of the business (default '').
       phone_number:
         type: string
-        description: Phone number of the business.
+        description: Phone number of the business (default '').
       address:
         type: string
-        description: Business address.
+        description: Business address (default '').
       city:
         type: string
-        description: City where the business is located.
+        description: City where the business is located (default '').
       state:
         type: string
-        description: State where the business is located.
+        description: State where the business is located (default '').
       postal_code:
         type: string
-        description: Postal code of the business location.
+        description: Postal code of the business location (default '').
       country:
         type: string
-        description: Country where the business is located.
+        description: Country where the business is located (default '').
       website_url:
         type: string
         format: uri
-        description: URL of the business website.
-      profile_image_url:
-        type: string
-        format: uri
-        description: URL of the business profile image.
-      password:
-        type: string
-        description: Hashed password for the business account.
-      password_changed_at:
-        type: string
-        format: date-time
-        description: Date and time when the password was last changed.
+        description: URL of the business website (default '').
+      completed_onboarding:
+        type: boolean
+        description: Indicates whether the business has completed onboarding (default `false`).
       created_at:
         type: string
         format: date-time
-        description: Date and time when the business was created.
+        description: Date and time when the business was created (default now()).
       updated_at:
         type: string
         format: date-time
-        description: Date and time when the business was last updated.
+        description: Date and time when the business was last updated (default now()).
       is_active:
         type: boolean
-        description: Indicates whether the business is active.
-      is_email_verified:
-        type: boolean
-        description: Indicates whether the email of the business is verified.
+        description: Indicates whether the business is active (default `true`).
     required:
       - id
+      - owner_id
       - name
-      - about
-      - email
+      - description
+      - general_email
+      - dispute_email
       - phone_number
       - address
       - city
@@ -341,13 +351,10 @@ definitions:
       - postal_code
       - country
       - website_url
-      - profile_image_url
-      - password
-      - password_changed_at
+      - completed_onboarding
       - created_at
       - updated_at
       - is_active
-      - is_email_verified
 
   BadRequestErrorResponse:
     type: object
