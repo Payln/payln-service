@@ -12,6 +12,7 @@ export interface Payload {
   email: string;
   extra: any;
   expired_at: Date;
+  iat: Date;
 }
 
 export const ErrInvalidToken = new Error("token is invalid");
@@ -40,6 +41,7 @@ class PasetoMaker {
       email,
       extra,
       expired_at: new Date(Date.now() + duration * 60 * 1000),
+      iat: new Date(Date.now())
     };
 
     const token = await encrypt(payload, this.symmetricKey);
