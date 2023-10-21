@@ -1,11 +1,13 @@
 import express, { Router } from "express";
-import { createBusiness, validateCreateBusiness } from "../controllers/business";
+import { createBusiness, validateCreateBusinessParams } from "../controllers/business";
+import { authenticate } from "../middleware/authorization";
 
 
 const businessRouter: Router = express.Router();
+businessRouter.use(authenticate);
 
 businessRouter
 	.route("/")
-	.post(validateCreateBusiness, createBusiness);
+	.post(validateCreateBusinessParams, createBusiness);
 
 export default businessRouter;
