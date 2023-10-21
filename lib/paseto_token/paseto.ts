@@ -6,14 +6,6 @@ import { afterTime } from "../utils/random";
 
 const { encrypt, decrypt } = V3;
 
-export interface Payload {
-  id: string;
-  user_id: number;
-  email: string;
-  extra: any;
-  expired_at: Date;
-}
-
 export const ErrInvalidToken = new Error("token is invalid");
 export const ErrExpiredToken = new Error("token has expired");
 
@@ -40,6 +32,7 @@ class PasetoMaker {
       email,
       extra,
       expired_at: new Date(Date.now() + duration * 60 * 1000),
+      iat: new Date(Date.now())
     };
 
     const token = await encrypt(payload, this.symmetricKey);

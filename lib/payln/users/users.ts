@@ -88,7 +88,6 @@ class User {
       }
     }
   }
-
 }
 
 const userClass = new User();
