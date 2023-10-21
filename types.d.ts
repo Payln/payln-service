@@ -82,3 +82,12 @@ interface EmailVerificationQueueParams {
 interface DeleteSessionTokenParams {
   sessionTokenId: string
 }
+
+interface Payload {
+  id: string;
+  user_id: number;
+  email: string;
+  extra: any;
+  expired_at: Date;
+  iat: Date;
+}

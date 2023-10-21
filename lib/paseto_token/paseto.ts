@@ -6,15 +6,6 @@ import { afterTime } from "../utils/random";
 
 const { encrypt, decrypt } = V3;
 
-export interface Payload {
-  id: string;
-  user_id: number;
-  email: string;
-  extra: any;
-  expired_at: Date;
-  iat: Date;
-}
-
 export const ErrInvalidToken = new Error("token is invalid");
 export const ErrExpiredToken = new Error("token has expired");
 

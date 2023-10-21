@@ -25,8 +25,18 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         }
       });
     }
-
-    const payload = await pasetoMaker.verifyToken(token);
+    
+    let payload;
+    try {
+      payload = await pasetoMaker.verifyToken(token);
+    } catch (error: any) {
+      return res.status(401).json({
+        status: "error",
+        data: {
+          message: error.message,
+        }
+      });
+    }
 
     const user = await userClass.getUser(payload.user_id, null);
     if (!user) {
@@ -53,7 +63,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
       });
     }
 
-    res.locals.userPayload = payload;
+    res.locals.authenticatePayload = payload;
     next();
   } catch (error: any) {
     logger.error(error.message);
