@@ -25,7 +25,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         }
       });
     }
-    
+
     let payload;
     try {
       payload = await pasetoMaker.verifyToken(token);
@@ -72,4 +72,14 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
       message: "An error occurred authenticating the user",
     });
   }
+}
+
+export function checkAuth(req: Request, res: Response, next: NextFunction) {
+  if (!res.locals.authenticatePayload) {
+    return res.status(401).json({
+      status: "error",
+      message: "Unauthorized access. Please log in.",
+    });
+  }
+  next();
 }

@@ -11,6 +11,7 @@ export const validateCreateBusinessParams = [
   body("website_url").trim().isURL().withMessage("Invalid URL format"),
 ];
 
+// createBusiness maps to endpoint "POST /businesses"
 export async function createBusiness(req: Request, res: Response) {
   try {
     const errors = validationResult(req);
@@ -19,15 +20,15 @@ export async function createBusiness(req: Request, res: Response) {
     }
 
     const { name, description, general_email, website_url } = req.body;
-    
+
     const payload: Payload = res.locals.authenticatePayload;
 
     const business = await businessClass.insertBusiness(
-      payload.user_id, 
-      name, 
+      payload.user_id,
+      name,
       description,
       website_url,
-      general_email, 
+      general_email,
     );
     if (!business) {
       return res.status(500).json({
@@ -50,6 +51,103 @@ export async function createBusiness(req: Request, res: Response) {
     return res.status(500).json({
       status: "error",
       message: "An error occurred while creating the business",
+    });
+  }
+}
+
+export const validateCompleteBusinessCreationParams = [
+  body("business_id")
+    .trim()
+    .isUUID(4)
+    .withMessage("Invalid business_id format. It must be a UUID (version 4)."),
+
+  body("phone_number")
+    .trim()
+    .isMobilePhone("any", { strictMode: false })
+    .withMessage("Invalid phone number format"),
+
+  body("dispute_email")
+    .trim()
+    .isEmail()
+    .withMessage("Invalid dispute_email format"),
+
+  body("address")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Address is required"),
+
+  body("city")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("City is required"),
+
+  body("state")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("State is required"),
+
+  body("postal_code")
+    .trim()
+    .isPostalCode("any")
+    .withMessage("Invalid postal code format"),
+
+  body("country")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Country is required"),
+];
+
+// completeBusinessCreation maps to endpoint "PATCH /businesses/complete-business-creation"
+export async function completeBusinessCreation(req: Request, res: Response) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const {
+      business_id,
+      phone_number,
+      dispute_email,
+      address,
+      city,
+      state,
+      postal_code,
+      country,
+    } = req.body;
+
+    const business = await businessClass.completeBusinessDetails(
+      business_id,
+      phone_number,
+      dispute_email,
+      address,
+      city,
+      state,
+      postal_code,
+      country
+    );
+
+    if (!business) {
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to update business details.",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        message: "Business successfully updated.",
+        result: {
+          business: business,
+        },
+      },
+    });
+  } catch (error: any) {
+    logger.error(error.message);
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while updating business details.",
     });
   }
 }
