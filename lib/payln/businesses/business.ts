@@ -50,7 +50,8 @@ class Business {
           state = ${state},
           postal_code = ${postalCode},
           country = ${country},
-          completed_onboarding = TRUE
+          completed_onboarding = TRUE,
+          updated_at = ${new Date()}
         WHERE
           id = ${id}
         RETURNING *;
@@ -104,11 +105,11 @@ class Business {
   }
 
   async updateBusiness(
-    id: number,
+    id: string,
     name: string | null = null,
     description: string | null = null,
+    generalEmail: string | null = null,
     websiteUrl: string | null = null,
-    email: string | null = null,
     phoneNumber: string | null = null,
     disputeEmail: string | null = null,
     address: string | null = null,
@@ -124,7 +125,7 @@ class Business {
           name = COALESCE(${name}, name),
           description = COALESCE(${description}, description),
           website_url = COALESCE(${websiteUrl}, website_url),
-          email = COALESCE(${email}, email),
+          general_email = COALESCE(${generalEmail}, general_email),
           phone_number = COALESCE(${phoneNumber}, phone_number),
           dispute_email = COALESCE(${disputeEmail}, dispute_email),
           address = COALESCE(${address}, address),

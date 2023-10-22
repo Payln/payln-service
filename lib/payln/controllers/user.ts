@@ -35,14 +35,18 @@ export async function emailVerification(req: Request, res: Response) {
     if (!session) {
       return res.status(404).json({
         status: "error",
-        message: "Invalid OTP or user ID provided.",
+        error: {
+          message: "Invalid OTP or user ID provided.",
+        }
       });
     }
 
     if (afterTime(session.expires_at)) {
       return res.status(401).json({
         status: "error",
-        message: "Provided OTP has expired.",
+        error: {
+          message: "Provided OTP has expired.",
+        }
       });
     }
 
@@ -50,7 +54,9 @@ export async function emailVerification(req: Request, res: Response) {
     if (!updatedUser) {
       return res.status(404).json({
         status: "error",
-        message: "Invalid User ID provided.",
+        error: {
+          message: "Invalid User ID provided.",
+        }
       });
     }
 
@@ -76,7 +82,9 @@ export async function emailVerification(req: Request, res: Response) {
     logger.error(error.message);
     return res.status(500).json({
       status: "error",
-      message: "An error occurred while verifying user's email",
+      error: {
+        message: "An error occurred while verifying user's email",
+      }
     });
   }
 }
@@ -98,7 +106,9 @@ export async function sendEmailVerification(req: Request, res: Response) {
     if (!user) {
       return res.status(404).json({
         status: "error",
-        message: "User not found",
+        error: {
+          message: "User not found",
+        }
       });
     }
 
@@ -126,7 +136,9 @@ export async function sendEmailVerification(req: Request, res: Response) {
     logger.error(error.message);
     return res.status(500).json({
       status: "error",
-      message: "An error occurred while creating the user",
+      error: {
+        message: "An error occurred while creating the user",
+      }
     });
   }
 }

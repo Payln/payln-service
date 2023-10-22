@@ -37,7 +37,9 @@ export async function signUpUser(req: Request, res: Response) {
       // Handle the case where user is undefined
       return res.status(500).json({
         status: "error",
-        message: "User creation failed",
+        error: {
+          message: "User creation failed",
+        }
       });
     }
 
@@ -61,7 +63,9 @@ export async function signUpUser(req: Request, res: Response) {
     logger.error(error.message);
     return res.status(500).json({
       status: "error",
-      message: "An error occurred while creating the user",
+      error: {
+        message: "An error occurred while creating the user",
+      }
     });
   }
 }
@@ -86,7 +90,9 @@ export async function loginUser(req: Request, res: Response) {
     if (!user) {
       return res.status(401).json({
         status: "error",
-        message: "Email or password is wrong",
+        error: {
+          message: "Email or password is wrong",
+        }
       });
     }
 
@@ -94,14 +100,18 @@ export async function loginUser(req: Request, res: Response) {
     if (!correct) {
       return res.status(401).json({
         status: "error",
-        message: "Email or password is wrong",
+        error: {
+          message: "Email or password is wrong",
+        }
       });
     }
 
     if (!user.is_active) {
       return res.status(403).json({
         status: "error",
-        message: "Your account is inactive. Please contact PayLN support to activate your account.",
+        error: {
+          message: "Your account is inactive. Please contact PayLN support to activate your account.",
+        }
       });
     }
 
@@ -137,7 +147,9 @@ export async function loginUser(req: Request, res: Response) {
     logger.error(error.message);
     return res.status(500).json({
       status: "error",
-      message: "An error occurred while verifying user's email",
+      error: {
+        message: "An error occurred while verifying user's email",
+      }
     });
   }
 }
