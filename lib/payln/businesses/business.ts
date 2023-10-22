@@ -30,7 +30,7 @@ class Business {
   }
 
   async completeBusinessDetails(
-    id: number,
+    id: string,
     phoneNumber: string,
     disputeEmail: string,
     address: string,
@@ -50,7 +50,7 @@ class Business {
           state = ${state},
           postal_code = ${postalCode},
           country = ${country},
-          completed_onboarding = true
+          completed_onboarding = TRUE
         WHERE
           id = ${id}
         RETURNING *;

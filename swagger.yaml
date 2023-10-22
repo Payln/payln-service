@@ -66,6 +66,53 @@ paths:
       security:
         - Bearer: []
 
+  /businesses/complete-business-creation:
+    patch:
+      summary: Complete business creation
+      description: Complete the creation of a business by providing additional details.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/CompleteBusinessCreationRequest"
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              data:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      business:
+                        $ref: "#/definitions/Business"
+        400:
+          description: Bad Request.
+          schema:
+            $ref: "#/definitions/BadRequestErrorResponse"
+        401:
+          description: Unauthorized.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        404:
+          description: Not Found.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: Internal server error.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      security:
+        - Bearer: []
+
   /auth/signup:
     post:
       summary: Sign up a new user
@@ -463,3 +510,40 @@ definitions:
     required:
       - otp
       - user_id
+
+  CompleteBusinessCreationRequest:
+    type: object
+    properties:
+      business_id:
+        type: string
+        format: uuid
+        description: Unique identifier for the business.
+      phone_number:
+        type: string
+        description: Phone number of the business.
+      dispute_email:
+        type: string
+        format: email
+        description: Dispute email address of the business.
+      address:
+        type: string
+        description: Business address.
+      city:
+        type: string
+        description: City where the business is located.
+      state:
+        type: string
+        description: State where the business is located.
+      postal_code:
+        type: string
+        description: Postal code of the business location.
+      country:
+        type: string
+        description: Country where the business is located.
+    required:
+      - business_id
+      - address
+      - city
+      - state
+      - postal_code
+      - country

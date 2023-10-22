@@ -1,6 +1,6 @@
 import express, { Router } from "express";
-import { createBusiness, validateCreateBusinessParams } from "../controllers/business";
-import { authenticate } from "../middleware/authorization";
+import { completeBusinessCreation, createBusiness, validateCompleteBusinessCreationParams, validateCreateBusinessParams } from "../controllers/business";
+import { authenticate, checkAuth } from "../middleware/authorization";
 
 
 const businessRouter: Router = express.Router();
@@ -8,6 +8,10 @@ businessRouter.use(authenticate);
 
 businessRouter
 	.route("/")
-	.post(validateCreateBusinessParams, createBusiness);
+	.post(checkAuth, validateCreateBusinessParams, createBusiness);
+
+businessRouter
+	.route("/complete-business-creation")
+	.patch(checkAuth, validateCompleteBusinessCreationParams, completeBusinessCreation);
 
 export default businessRouter;
