@@ -113,6 +113,57 @@ paths:
       security:
         - Bearer: []
 
+  /businesses/{business_id}:
+    patch:
+      summary: Update a business
+      description: Update a business with partial data.
+      parameters:
+        - name: business_id
+          in: path
+          required: true
+          type: string
+          format: uuid
+          description: Unique identifier for the business.
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateBusinessRequest"
+      responses:
+        200:
+          description: OK.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              data:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      business:
+                        $ref: "#/definitions/Business"
+        400:
+          description: Bad Request.
+          schema:
+            $ref: "#/definitions/BadRequestErrorResponse"
+        401:
+          description: Unauthorized.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        404:
+          description: Not Found.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: Internal server error.
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /auth/signup:
     post:
       summary: Sign up a new user
@@ -547,3 +598,44 @@ definitions:
       - state
       - postal_code
       - country
+
+  UpdateBusinessRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Business name (optional).
+      description:
+        type: string
+        description: Business description (optional).
+      general_email:
+        type: string
+        format: email
+        description: General email address of the business (optional).
+      website_url:
+        type: string
+        format: uri
+        description: URL of the business website (optional).
+      phone_number:
+        type: string
+        description: Phone number of the business (optional).
+      dispute_email:
+        type: string
+        format: email
+        description: Dispute email address of the business (optional).
+      address:
+        type: string
+        description: Business address (optional).
+      city:
+        type: string
+        description: City where the business is located (optional).
+      state:
+        type: string
+        description: State where the business is located (optional).
+      postal_code:
+        type: string
+        description: Postal code of the business location (optional).
+      country:
+        type: string
+        description: Country where the business is located (optional).
+

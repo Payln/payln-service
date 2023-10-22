@@ -20,7 +20,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     if (!token) {
       return res.status(401).json({
         status: "error",
-        data: {
+        error: {
           message: "You are not logged in! Please log in to get access."
         }
       });
@@ -32,7 +32,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     } catch (error: any) {
       return res.status(401).json({
         status: "error",
-        data: {
+        error: {
           message: error.message,
         }
       });
@@ -42,14 +42,16 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     if (!user) {
       return res.status(404).json({
         status: "error",
-        message: "User not found",
+        error: {
+          message: "User not found",
+        }
       });
     }
 
     if (new Date(user.password_changed_at) > new Date(payload.iat)) {
       return res.status(401).json({
         status: "error",
-        data: {
+        error: {
           message: "User recently changed password! Please log in again."
         }
       });
@@ -58,8 +60,10 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     const isBlacklisted = await checkInRedis(payload.id);
     if (isBlacklisted) {
       return res.status(401).json({
-        status: "info",
-        message: "invalid token",
+        status: "error",
+        error: {
+          message: "invalid token",
+        }
       });
     }
 
@@ -69,7 +73,9 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     logger.error(error.message);
     return res.status(500).json({
       status: "error",
-      message: "An error occurred authenticating the user",
+      error: {
+        message: "An error occurred authenticating the user",
+      }
     });
   }
 }
@@ -78,7 +84,9 @@ export function checkAuth(req: Request, res: Response, next: NextFunction) {
   if (!res.locals.authenticatePayload) {
     return res.status(401).json({
       status: "error",
-      message: "Unauthorized access. Please log in.",
+      error: {
+        message: "Unauthorized access. Please log in.",
+      }
     });
   }
   next();

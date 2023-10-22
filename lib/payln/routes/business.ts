@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { completeBusinessCreation, createBusiness, validateCompleteBusinessCreationParams, validateCreateBusinessParams } from "../controllers/business";
+import { completeBusinessCreation, createBusiness, updateBusiness, validateCompleteBusinessCreationParams, validateCreateBusinessParams, validateUpdateBusinessParams } from "../controllers/business";
 import { authenticate, checkAuth } from "../middleware/authorization";
 
 
@@ -13,5 +13,9 @@ businessRouter
 businessRouter
 	.route("/complete-business-creation")
 	.patch(checkAuth, validateCompleteBusinessCreationParams, completeBusinessCreation);
+
+businessRouter
+	.route("/:business_id")
+	.patch(checkAuth, validateUpdateBusinessParams, updateBusiness);
 
 export default businessRouter;
