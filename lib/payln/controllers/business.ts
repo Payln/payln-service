@@ -109,6 +109,8 @@ export async function completeBusinessCreation(req: Request, res: Response) {
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const payload: Payload = res.locals.authenticatePayload;
+
     const {
       business_id,
       phone_number,
@@ -122,6 +124,7 @@ export async function completeBusinessCreation(req: Request, res: Response) {
 
     const business = await businessClass.completeBusinessDetails(
       business_id,
+      payload.user_id,
       phone_number,
       dispute_email,
       address,
@@ -241,6 +244,8 @@ export async function updateBusiness(req: Request, res: Response) {
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const payload: Payload = res.locals.authenticatePayload;
+
     const {
       name,
       description,
@@ -259,6 +264,7 @@ export async function updateBusiness(req: Request, res: Response) {
 
     const business = await businessClass.updateBusiness(
       businessId,
+      payload.user_id,
       name,
       description,
       general_email,
@@ -316,10 +322,10 @@ export async function getBusiness(req: Request, res: Response) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const businessId = req.params.business_id;
+    const payload: Payload = res.locals.authenticatePayload;
 
-    const business = await businessClass.getBusiness(
-      businessId,
+    const business = await businessClass.getBusinessByOwner(
+      payload.user_id,
     );
 
     if (!business) {

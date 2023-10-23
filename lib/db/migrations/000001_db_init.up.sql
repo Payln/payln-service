@@ -56,3 +56,73 @@ BEGIN
   DELETE FROM sessions WHERE expires_at < NOW();
 END;
 $$ LANGUAGE plpgsql;
+
+-- Accounts Table
+CREATE TABLE "accounts" (
+  "id" bigserial PRIMARY KEY,
+  "business_id" uuid NOT NULL,
+  "currency" varchar NOT NULL,
+  "balance" NUMERIC(18, 2) NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "updated_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+ALTER TABLE "accounts" ADD FOREIGN KEY ("business_id") REFERENCES "businesses" ("id") ON DELETE CASCADE;
+
+-- Invoices Table
+CREATE TABLE "invoices" (
+  "id" uuid PRIMARY KEY,
+  "invoice_id" varchar UNIQUE NOT NULL,
+  "account_id" bigint NOT NULL,
+  "amount" NUMERIC(18, 2) NOT NULL,
+  "currency_symbol" varchar NOT NULL,
+  "description" TEXT NOT NULL,
+  "status" varchar NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "updated_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+ALTER TABLE "invoices" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE;
+
+-- Inbound_transactions Table
+CREATE TABLE "inbound_transactions" (
+  "id" uuid PRIMARY KEY,
+  "invoice_id" uuid NOT NULL,
+  "amount" NUMERIC(18, 2) NOT NULL,
+  "from_wallet_address" varchar NOT NULL,
+  "to_wallet_address" varchar NOT NULL,
+  "currency_symbol" varchar NOT NULL,
+  "transaction_fee" NUMERIC(10, 2) NOT NULL,
+  "conversion_fee" NUMERIC(10, 2) NOT NULL,
+  "description" TEXT NOT NULL,
+  "transaction_type" varchar NOT NULL,
+  "transaction_ref_id" varchar NOT NULL,
+  "status" varchar NOT NULL,
+  "transaction_hash" varchar NOT NULL,
+  "account_balance_snapshot" NUMERIC(18, 2) NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "updated_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+ALTER TABLE "inbound_transactions" ADD FOREIGN KEY ("invoice_id") REFERENCES "invoices" ("id") ON DELETE CASCADE;
+
+-- Outbound_transactions Table
+CREATE TABLE "outbound_transactions" (
+  "id" uuid PRIMARY KEY,
+  "amount" NUMERIC(18, 2) NOT NULL,
+  "from_account_id" bigint NOT NULL,
+  "to_destination" varchar NOT NULL, -- Store destination information (e.g., wallet address, bank account number)
+  "currency_symbol" varchar NOT NULL,
+  "transaction_fee" NUMERIC(10, 2) NOT NULL,
+  "conversion_fee" NUMERIC(10, 2) NOT NULL,
+  "description" TEXT NOT NULL,
+  "transaction_type" varchar NOT NULL, -- Type of outbound transaction (e.g., "crypto_transfer", "bank_withdrawal")
+  "transaction_ref_id" varchar NOT NULL,
+  "status" varchar NOT NULL,
+  "transaction_hash" varchar NOT NULL,
+  "account_balance_snapshot" NUMERIC(18, 2) NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "updated_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+ALTER TABLE "outbound_transactions" ADD FOREIGN KEY ("from_account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE;

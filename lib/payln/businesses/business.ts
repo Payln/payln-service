@@ -31,6 +31,7 @@ class Business {
 
   async completeBusinessDetails(
     id: string,
+    ownerId: number,
     phoneNumber: string,
     disputeEmail: string,
     address: string,
@@ -53,7 +54,7 @@ class Business {
           completed_onboarding = TRUE,
           updated_at = ${new Date()}
         WHERE
-          id = ${id}
+          id = ${id} AND owner_id = ${ownerId}
         RETURNING *;
       `;
       return business;
@@ -106,6 +107,7 @@ class Business {
 
   async updateBusiness(
     id: string,
+    ownerId: number,
     name: string | null = null,
     description: string | null = null,
     generalEmail: string | null = null,
@@ -135,7 +137,7 @@ class Business {
           country = COALESCE(${country}, country),
           updated_at = ${new Date()}
         WHERE
-          id = ${id}
+          id = ${id} AND owner_id = ${ownerId}
         RETURNING *;
       `;
       return business;
@@ -143,23 +145,6 @@ class Business {
       if (error instanceof PostgresError) {
         const dbErrMsg = error.message;
         throw new Error(`Update failed on '${dbErrMsg}'`);
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  async deleteBusiness(id: number) {
-    try {
-      await sql`
-        DELETE FROM businesses
-        WHERE
-          id = ${id};
-      `;
-    } catch (error) {
-      if (error instanceof PostgresError) {
-        const dbErrMsg = error.message;
-        throw new Error(`Deletion failed on '${dbErrMsg}'`);
       } else {
         throw error;
       }
