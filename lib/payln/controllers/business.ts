@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import logger from "../../logger/logger";
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 import businessClass from "../businesses/business";
 
 export const validateCreateBusinessParams = [
@@ -162,6 +162,10 @@ export async function completeBusinessCreation(req: Request, res: Response) {
 
 // Validation for updating a business with partial data
 export const validateUpdateBusinessParams = [
+  param("business_id")
+    .isUUID(4)
+    .withMessage("Invalid business_id format. It must be a UUID (version 4)."),
+
   body("name")
     .optional()
     .trim()
@@ -250,6 +254,7 @@ export async function updateBusiness(req: Request, res: Response) {
       postal_code,
       country,
     } = req.body;
+
     const businessId = req.params.business_id;
 
     const business = await businessClass.updateBusiness(
@@ -291,6 +296,56 @@ export async function updateBusiness(req: Request, res: Response) {
       status: "error",
       error: {
         message: "An error occurred while updating business details.",
+      }
+    });
+  }
+}
+
+// Validation for business_id.
+export const validateGetBusinessParams = [
+  param("business_id")
+    .isUUID(4)
+    .withMessage("Invalid business_id format. It must be a UUID (version 4)."),
+];
+
+// getBusiness maps to endpoint "GET /businesses/{business_id}"
+export async function getBusiness(req: Request, res: Response) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const businessId = req.params.business_id;
+
+    const business = await businessClass.getBusiness(
+      businessId,
+    );
+
+    if (!business) {
+      return res.status(500).json({
+        status: "error",
+        error: {
+          message: "Failed to get business details.",
+        }
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        message: "Found the business.",
+        result: {
+          business: business,
+        },
+      },
+    });
+  } catch (error: any) {
+    logger.error(error.message);
+    return res.status(500).json({
+      status: "error",
+      error: {
+        message: "An error occurred while getting business details.",
       }
     });
   }

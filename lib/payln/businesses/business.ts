@@ -67,7 +67,7 @@ class Business {
     }
   }
 
-  async getBusiness(id: number) {
+  async getBusiness(id: string) {
     try {
       const [business]: [IBusiness?] = await sql`
         SELECT *
